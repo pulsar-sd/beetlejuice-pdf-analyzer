@@ -1,35 +1,55 @@
+// main.go
 package main
 
 import (
 	"fmt"
-	"go-pdf-analyzer/tools"
+	"log"
 	"os"
 	"path/filepath"
+
+	"go-pdf-analyzer/tools" // Replace with your module name
 )
 
 func main() {
+	// Define the current working directory dynamically
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Error getting current directory: %v", err)
+	}
+	fmt.Printf("Current working directory: %s\n", currentDir)
 
-	outputPath := "./output.txt"
+	// Define the PDF file and tools path
+	pdfPath := filepath.Join(currentDir, "example.pdf")
+	textOutputPath := filepath.Join(currentDir, "output.txt")
 
-	wd, _ := os.Getwd()                         // Get the working directory
-	pdfPath := filepath.Join(wd, "example.pdf") // Construct the absolute path
-	fmt.Printf("Current working directory: %s\n", wd)
+	// Verify if the file exists
+	if _, err := os.Stat(pdfPath); os.IsNotExist(err) {
+		log.Fatalf("PDF file not found: %s", pdfPath)
+	}
 	fmt.Printf("PDF path: %s\n", pdfPath)
 
-	// Simulate the tool execution
-	output, err := tools.RunPDFInfo(pdfPath)
+	// Run pdfinfo to get metadata
+	fmt.Println("Running pdfinfo...")
+	pdfInfoOutput, err := tools.RunPDFInfo(pdfPath)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return
+		log.Fatalf("Error running pdfinfo: %v", err)
 	}
 	fmt.Println("PDF Info Output:")
-	fmt.Println(output)
+	fmt.Println(pdfInfoOutput)
 
-	// Run pdftotext
-	err = tools.RunPDFToText(pdfPath, outputPath)
+	// Run pdftotext to extract text
+	fmt.Println("Extracting text with pdftotext...")
+	err = tools.RunPDFToText(pdfPath, textOutputPath)
 	if err != nil {
-		fmt.Printf("Error running pdftotext: %v\n", err)
-		return
+		log.Fatalf("Error running pdftotext: %v", err)
 	}
 	fmt.Println("Text extraction completed.")
+
+	// Read the extracted text
+	extractedText, err := os.ReadFile(textOutputPath)
+	if err != nil {
+		log.Fatalf("Error reading extracted text: %v", err)
+	}
+	fmt.Println("Extracted Text:")
+	fmt.Println(string(extractedText))
 }
