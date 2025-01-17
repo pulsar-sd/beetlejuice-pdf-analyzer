@@ -10,7 +10,7 @@ import (
 func RunPDFInfo(pdfPath string) (string, error) {
 	// Use the absolute path to the `pdfinfo` binary
 
-	cmd := exec.Command("./tools/pdfinfo", "/opt/render/project/go/src/github.com/jdee-gold/go-pdf-analyzer/example.pdf")
+	cmd := exec.Command("./tools/pdfinfo", "example.pdf")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
