@@ -3,11 +3,11 @@ package main
 
 import (
 	"fmt"
+	"go-pdf-analyzer/tools" // Replace with your module name
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
-
-	"go-pdf-analyzer/tools" // Replace with your module name
 )
 
 func main() {
@@ -52,4 +52,22 @@ func main() {
 	}
 	fmt.Println("Extracted Text:")
 	fmt.Println(string(extractedText))
+
+	// Get the port from the environment variable
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default to port 8080 if no environment variable is set
+	}
+
+	// Basic HTTP handler
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "PDF Analyzer Service is running!")
+	})
+
+	// Start the server
+	fmt.Printf("Server is listening on port %s\n", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		fmt.Printf("Error starting server: %v\n", err)
+		os.Exit(1)
+	}
 }
