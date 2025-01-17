@@ -11,25 +11,19 @@ func main() {
 
 	outputPath := "./output.txt"
 
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Printf("Error getting working directory: %v\n", err)
-		return
-	}
+	wd, _ := os.Getwd()                         // Get the working directory
+	pdfPath := filepath.Join(wd, "example.pdf") // Construct the absolute path
 	fmt.Printf("Current working directory: %s\n", wd)
-
-	// Construct absolute paths
-	pdfPath := filepath.Join(wd, "example.pdf")
 	fmt.Printf("PDF path: %s\n", pdfPath)
 
-	// Run pdfinfo
-	info, err := tools.RunPDFInfo(pdfPath)
+	// Simulate the tool execution
+	output, err := tools.RunPDFInfo(pdfPath)
 	if err != nil {
-		fmt.Printf("Error running pdfinfo: %v\n", err)
+		fmt.Printf("Error: %v\n", err)
 		return
 	}
 	fmt.Println("PDF Info Output:")
-	fmt.Println(info)
+	fmt.Println(output)
 
 	// Run pdftotext
 	err = tools.RunPDFToText(pdfPath, outputPath)
