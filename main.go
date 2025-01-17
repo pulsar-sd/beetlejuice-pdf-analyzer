@@ -19,7 +19,7 @@ func main() {
 	fmt.Printf("Current working directory: %s\n", currentDir)
 
 	// Define the PDF file and tools path
-	pdfPath := filepath.Join(currentDir, "example.pdf")
+	pdfPath := filepath.Join(currentDir, "tools", "example.PDF")
 	textOutputPath := filepath.Join(currentDir, "output.txt")
 
 	// Verify if the file exists
