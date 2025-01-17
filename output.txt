@@ -34,12 +34,11 @@ SG Equipment Finance Schweiz AG
 http://SGZH -SQL05:8080/SwissQR ?ib an=CH06%203070%200110%200003%201411%202&ibanType=1&billInformation=&unstructuredMessage=&currency=756&creditorName=SG%20Equipment%20Fin ance%20Schweiz%20AG&creditorAddressLine1=Gladbachstrasse%20105&creditorCountry=CH&creditorAddressLine2=8044%20Z%C3%BCrich &re ferenceType=0&re ference=932564700000010331301107233&debitorN ame=Konrad%20Wohlwend%20Ha ndel%20und%20Lohnarbeiten%20Anstalt&debitorAddressLine1=Ch urerstrasse%2050&debitorC ountry =LI&debitorAddressLine2=9485% 20Ne ndeln&amount=1576.80&pixel=7
 
 Empfangsschein
-
-Zahlteil
-
 Konto / Zahlbar an
 CH06 3070 0110 0003 1411 2
 SG Equipment Finance Schweiz AG Gladbachstrasse 105 8044 Zürich
+
+Zahlteil
 
 Zahlbar durch
 Konrad Wohlwend Handel und Lohnarbeiten Anstalt Churerstrasse 50 9485 NENDELN
