@@ -9,9 +9,8 @@ import (
 // RunPDFInfo executes the pdfinfo command to extract metadata from a PDF.
 func RunPDFInfo(pdfPath string) (string, error) {
 	// Use the absolute path to the `pdfinfo` binary
-	pdfinfoPath := "./tools/pdfinfo"
 
-	cmd := exec.Command(pdfinfoPath, pdfPath)
+	cmd := exec.Command("./tools/pdfinfo", "/opt/render/project/go/src/github.com/jdee-gold/go-pdf-analyzer/example.pdf")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
@@ -20,6 +19,7 @@ func RunPDFInfo(pdfPath string) (string, error) {
 		fmt.Printf("Command: %s\n", cmd.String())
 		fmt.Printf("Error: %v\n", err)
 		fmt.Printf("Stderr: %s\n", stderr.String())
+
 	}
 	return string(output), nil
 }

@@ -4,19 +4,23 @@ import (
 	"fmt"
 	"go-pdf-analyzer/tools"
 	"os"
+	"path/filepath"
 )
 
 func main() {
-	pdfPath := "./example.pdf"
+
 	outputPath := "./output.txt"
 
-	// Check the current working directory
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Printf("Error getting working directory: %v\n", err)
 		return
 	}
 	fmt.Printf("Current working directory: %s\n", wd)
+
+	// Construct absolute paths
+	pdfPath := filepath.Join(wd, "example.pdf")
+	fmt.Printf("PDF path: %s\n", pdfPath)
 
 	// Run pdfinfo
 	info, err := tools.RunPDFInfo(pdfPath)
