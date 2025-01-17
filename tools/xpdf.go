@@ -17,7 +17,9 @@ func RunPDFInfo(pdfPath string) (string, error) {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("error running pdfinfo: %v\nstderr: %s", err, stderr.String())
+		fmt.Printf("Command: %s\n", cmd.String())
+		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Stderr: %s\n", stderr.String())
 	}
 	return string(output), nil
 }
