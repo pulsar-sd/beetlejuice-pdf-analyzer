@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"go-pdf-analyzer/tools" // Replace with your module name
+	"go-pdf-analyzer/tools"
 	"io"
 	"log"
 	"net/http"
@@ -13,80 +13,72 @@ import (
 )
 
 func main() {
-	// Get the port from the environment variable
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080" // Default to port 8080 if no environment variable is set
-	}
-
-	// Analyze PDF handler
 	http.HandleFunc("/analyze", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			var requestData struct {
-				ID  int    `json:"id"`
-				URL string `json:"url"`
-			}
-
-			err := json.NewDecoder(r.Body).Decode(&requestData)
-			if err != nil {
-				http.Error(w, "Invalid request payload", http.StatusBadRequest)
-				log.Printf("Error decoding request: %v", err)
-				return
-			}
-
-			log.Printf("Received ID: %d, URL: %s", requestData.ID, requestData.URL)
-
-			// Download the PDF from the provided URL
-			pdfPath := filepath.Join(os.TempDir(), fmt.Sprintf("pdf_%d.pdf", requestData.ID))
-			err = downloadFile(requestData.URL, pdfPath)
-			if err != nil {
-				http.Error(w, "Failed to download PDF", http.StatusInternalServerError)
-				log.Printf("Error downloading PDF: %v", err)
-				return
-			}
-
-			// Run pdfinfo to get metadata
-			pdfInfoOutput, err := tools.RunPDFInfo(pdfPath)
-			if err != nil {
-				http.Error(w, "Failed to run pdfinfo", http.StatusInternalServerError)
-				log.Printf("Error running pdfinfo: %v", err)
-				return
-			}
-			log.Printf("PDF Info Output: %s", pdfInfoOutput)
-
-			// Extract page count from pdfinfo
-			pageCount := extractPageCount(pdfInfoOutput)
-
-			// Run pdftotext to extract text
-			textOutputPath := filepath.Join(os.TempDir(), fmt.Sprintf("text_%d.txt", requestData.ID))
-			err = tools.RunPDFToText(pdfPath, textOutputPath)
-			if err != nil {
-				http.Error(w, "Failed to run pdftotext", http.StatusInternalServerError)
-				log.Printf("Error running pdftotext: %v", err)
-				return
-			}
-
-			// Read the extracted text
-			extractedText, err := os.ReadFile(textOutputPath)
-			if err != nil {
-				http.Error(w, "Failed to read extracted text", http.StatusInternalServerError)
-				log.Printf("Error reading extracted text: %v", err)
-				return
-			}
-
-			// Send the response back to the client
-			fmt.Fprintf(w, "PDF Analysis Complete: PageCount=%d, TextLength=%d", pageCount, len(extractedText))
-		} else {
-			fmt.Fprintln(w, "PDF Analyzer Service is running!")
+		if r.Method != http.MethodPost {
+			http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
+			return
 		}
+
+		var request struct {
+			ID  int    `json:"id"`
+			URL string `json:"url"`
+		}
+		err := json.NewDecoder(r.Body).Decode(&request)
+		if err != nil {
+			http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+			log.Printf("Error decoding JSON: %v", err)
+			return
+		}
+
+		// Download and process the PDF
+		pdfPath := filepath.Join(os.TempDir(), fmt.Sprintf("pdf_%d.pdf", request.ID))
+		err = downloadFile(request.URL, pdfPath)
+		if err != nil {
+			http.Error(w, "Failed to download PDF", http.StatusInternalServerError)
+			log.Printf("Error downloading PDF: %v", err)
+			return
+		}
+
+		// Get metadata using pdfinfo
+		pageCount, err := tools.RunPDFInfo(pdfPath)
+		if err != nil {
+			http.Error(w, "Failed to analyze PDF", http.StatusInternalServerError)
+			log.Printf("Error analyzing PDF: %v", err)
+			return
+		}
+
+		// Extract text using pdftotext
+		textPath := filepath.Join(os.TempDir(), fmt.Sprintf("text_%d.txt", request.ID))
+		err = tools.RunPDFToText(pdfPath, textPath)
+		if err != nil {
+			http.Error(w, "Failed to extract text", http.StatusInternalServerError)
+			log.Printf("Error extracting text: %v", err)
+			return
+		}
+
+		extractedText, err := os.ReadFile(textPath)
+		if err != nil {
+			http.Error(w, "Failed to read extracted text", http.StatusInternalServerError)
+			log.Printf("Error reading text file: %v", err)
+			return
+		}
+
+		// Respond with JSON
+		response := map[string]interface{}{
+			"pageCount":     pageCount,
+			"extractedText": string(extractedText),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	})
 
-	// Start the server
-	fmt.Printf("Server is listening on port %s\n", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		fmt.Printf("Error starting server: %v\n", err)
-		os.Exit(1)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
+	log.Printf("Server is running on port %s", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+	// downloadFile function and tools methods should be defined elsewhere in your project.
 }
 
 // downloadFile downloads a file from a URL and saves it to the specified path.
