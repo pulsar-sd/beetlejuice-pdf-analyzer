@@ -3,13 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"go-pdf-analyzer/tools"
+	"go-pdf-analyzer/tools" // Update this import path based on your module name
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func main() {
@@ -72,13 +71,13 @@ func main() {
 		json.NewEncoder(w).Encode(response)
 	})
 
+	// Get port from environment variable
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8080" // Default to port 8080 if no environment variable is set
 	}
 	log.Printf("Server is running on port %s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
-	// downloadFile function and tools methods should be defined elsewhere in your project.
 }
 
 // downloadFile downloads a file from a URL and saves it to the specified path.
@@ -105,17 +104,4 @@ func downloadFile(url, filepath string) error {
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
-}
-
-// extractPageCount extracts the page count from the pdfinfo output.
-func extractPageCount(pdfInfo string) int {
-	lines := strings.Split(pdfInfo, "\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "Pages:") {
-			var pageCount int
-			fmt.Sscanf(line, "Pages: %d", &pageCount)
-			return pageCount
-		}
-	}
-	return 0 // Default if no page count is found
 }
